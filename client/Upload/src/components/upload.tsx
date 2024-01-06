@@ -20,7 +20,7 @@ function FileUpload() {
       const formData = new FormData();
       formData.append('file', file);
 
-      const response = await fetch('YOUR_API_ENDPOINT', {
+      const response = await fetch('http://localhost:4000/upload', {
         method: 'POST',
         body: formData,
       });

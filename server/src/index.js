@@ -1,10 +1,11 @@
-import { ApolloServer } from 'apollo-server-express';
-import schema from '../schema/schema.mjs'; // Make sure the path to your schema is correct
-import express from 'express';
+const { ApolloServer } = require('apollo-server-express');
+const schema = require('../schema/schema.js'); // Make sure the path to your schema is correct
+const express = require('express');
+const upload = require('./restAPI/upload'); 
+
+const app = express();
 
 async function startApolloServer() {
-  const app = express();
-
   const server = new ApolloServer({
     schema,
   });
@@ -21,3 +22,5 @@ async function startApolloServer() {
 startApolloServer().catch(error => {
   console.error('Error starting Apollo Server:', error);
 });
+
+app.use('/upload', upload)

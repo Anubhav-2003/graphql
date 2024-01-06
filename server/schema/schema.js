@@ -1,6 +1,12 @@
-import { GraphQLSchema, graphql } from 'graphql' 
-import pkg from 'lodash'
-import { GraphQLObjectType, GraphQLString, GraphQLID, GraphQLList} from 'graphql'
+const { graphql, GraphQLSchema } = require('graphql');
+const pkg = require('lodash');
+const {
+  GraphQLObjectType,
+  GraphQLString,
+  GraphQLID,
+  GraphQLList
+} = require('graphql');
+
 
 const { _ } = pkg
 //Dummy DB
@@ -81,4 +87,4 @@ const schema = new GraphQLSchema({
     query: RootQuery
 })
 
-export default schema
+module.exports = schema
