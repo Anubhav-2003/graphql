@@ -1,24 +1,27 @@
 import React, { useState, ChangeEvent } from 'react';
 
 function FileUpload() {
-  const [file, setFile] = useState<File | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0];
-    if (selectedFile) {
-      setFile(selectedFile);
+    const selectedFiles = e.target.files;
+    if (selectedFiles) {
+      const filesArray = Array.from(selectedFiles);
+      setFiles(filesArray);
     }
   };
 
   const handleUpload = async () => {
     try {
-      if (!file) {
-        console.error('Please select a file.');
+      if (!files.length) {
+        console.error('Please select at least one file.');
         return;
       }
 
       const formData = new FormData();
-      formData.append('file', file);
+      files.forEach((file) => {
+        formData.append(`files`, file);
+      });
 
       const response = await fetch('http://localhost:4000/upload', {
         method: 'POST',
@@ -26,18 +29,18 @@ function FileUpload() {
       });
 
       if (response.ok) {
-        console.log('File uploaded successfully!');
+        console.log('Files uploaded successfully!');
       } else {
-        console.error('Failed to upload file.');
+        console.error('Failed to upload files.');
       }
     } catch (error) {
-      console.error('Error uploading file:', error);
+      console.error('Error uploading files:', error);
     }
   };
 
   return (
     <div>
-      <input type="file" onChange={handleFileChange} />
+      <input type="file" onChange={handleFileChange} multiple />
       <button onClick={handleUpload}>Upload</button>
     </div>
   );
