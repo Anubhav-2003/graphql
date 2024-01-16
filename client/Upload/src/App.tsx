@@ -3,13 +3,13 @@ import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 import FileUpload from './components/upload'
+import AuthForm from './components/auth'
 
 function App() {
-  const [count, setCount] = useState(0)
 
   return (
     <>
-      <FileUpload/>
+      <AuthForm/>
     </>
   )
 }

@@ -1,5 +1,8 @@
-const { graphql, GraphQLSchema } = require('graphql');
+const { graphql, GraphQLSchema, GraphQLNonNull, GraphQLError } = require('graphql');
 const pkg = require('lodash');
+const Mutation = require('./mutations/mutations')
+const UserType = require('./types/user')
+const User = require('../src/utility/database/models/user')
 const {
   GraphQLObjectType,
   GraphQLString,
@@ -7,84 +10,51 @@ const {
   GraphQLList
 } = require('graphql');
 
-
 const { _ } = pkg
-//Dummy DB
-let books = [
-    {id: '1', name: "Count of Monte Cristo", genre: "Adventure", authorID: "1"},
-    {id: '2', name: "Ben Hur", genre: "Adventure", authorID: "2"}
-]
 
-let authors = [
-    {id: '1', name: "Alexander Dumas"},
-    {id: '2', name: "Jesus"}
-]
-
-
-const BookType = new GraphQLObjectType({
-    name: 'Book',
-    fields: () => ({
-        id: {type: GraphQLID},
-        name: {type: GraphQLString},
-        genre: {type: GraphQLString},
-        author: {
-            type: AuthorType,
-            resolve(parent, args) {
-                return _.find(authors, {id: parent.authorID})
-            }
+const fetchUserDetailsFromDB = async (email) => {
+    try {
+        const user = await User.findOne({ email: email });
+        
+        if (!user) {
+          throw new Error('User not found');
         }
-    })
-})
-
-const AuthorType = new GraphQLObjectType({
-    name: 'Author',
-    fields: () => ({
-        id: {type: GraphQLID},
-        name: {type: GraphQLString},
-        books: {
-            type: new GraphQLList(BookType),
-            resolve(parent, args) {
-                return _.filter(books, {authorID: parent.id})
-            }
-        }
-    })
-}) 
-
+    
+        return {
+          id: user.id,
+          email: user.email,
+        };
+      } catch (error) {
+        console.error('Error fetching user details:', error);
+        throw new Error('Error fetching user details');
+      }
+  };
 
 const RootQuery = new GraphQLObjectType({
     name: 'RootQueryType',
     fields: {
-        book: {
-            type: BookType,
-            args: {id: {type: GraphQLID}},
-            resolve(parent, args) {
-                return _.find(books, {id: args.id})
-            }
+      // Defining user query field
+      user: {
+        type: UserType,
+        args: {
+          email: { type: GraphQLString },
         },
-        author: {
-            type: AuthorType,
-            args: {id: {type: GraphQLID}},
-            resolve(parent, args) {
-                return _.find(authors, {id: args.id})
-            }
+        resolve: async (parent, { email }) => {
+          try {
+            const user = await fetchUserDetailsFromDB(email);
+            return user;
+          } catch (error) {
+            console.error('Error fetching user details:', error);
+            throw new Error('Error fetching user details');
+          }
         },
-        books: {
-            type: new GraphQLList(BookType),
-            resolve(parent, args) {
-                return books
-            }
-        },
-        authors: {
-            type: new GraphQLList(AuthorType),
-            resolve(parent, args) {
-                return authors
-            }
-        }
-    }
-})
+      },
+    },
+});
 
 const schema = new GraphQLSchema({
-    query: RootQuery
+    query: RootQuery,
+    mutation: Mutation,
 })
 
 module.exports = schema

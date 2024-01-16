@@ -2,6 +2,7 @@ const { ApolloServer } = require('apollo-server-express');
 const schema = require('../schema/schema.js'); // Make sure the path to your schema is correct
 const express = require('express');
 const upload = require('./restAPI/upload'); 
+const connectToDB = require('./utility/database/db.js');
 
 const app = express();
 
@@ -18,6 +19,8 @@ async function startApolloServer() {
     console.log('Server running on port 4000');
   });
 }
+
+connectToDB()
 
 startApolloServer().catch(error => {
   console.error('Error starting Apollo Server:', error);
