@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { CREATE_USER_MUTATION } from '../GraphQL/Mutations/createUser';
 import {
   TextField,
   Button,
@@ -10,6 +11,7 @@ import {
 } from '@mui/material';
 import { styled } from '@mui/system';
 import { ContainerProps } from '@mui/material/Container';
+import { useMutation } from '@apollo/client';
 
 const StyledContainer = styled(Container)({
     display: 'flex',
@@ -31,21 +33,24 @@ const AuthForm: React.FC = () => {
   const [password, setPassword] = useState<string>('');
   const [isLogin, setIsLogin] = useState<boolean>(true);
 
+  const [createUserMutation] = useMutation(CREATE_USER_MUTATION)
+
   const handleToggleForm = () => {
     setIsLogin(!isLogin);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Add your authentication logic here, for example, make API calls to handle login/signup
-    if (isLogin) {
-      // Handle login
-      console.log('Logging in with:', { email, password });
-    } else {
-      // Handle signup
-      console.log('Signing up with:', { email, password });
+
+    try {
+      const { data } = await createUserMutation({
+        variables: { email, password },
+      });
+      console.log('User created:', data.create_user);
+    } catch (error) {
+      console.error('Error creating user:', error);
     }
-    // Reset the form
+
     setEmail('');
     setPassword('');
   };
