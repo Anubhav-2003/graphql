@@ -27,6 +27,31 @@ const Mutation = new GraphQLObjectType({
         }
       },
     },
+    fetchUser: {
+      type: UserType,
+      args: {
+        email: { type: GraphQLString },
+        password: { type: GraphQLString },
+      },
+      async resolve(parent, args) {
+        try {
+          const user = await User.findOne({
+            email: args.email,
+            password: args.password,
+          });
+
+          if (!user) {
+            // If user is not found, throw an error
+            throw new Error('User not found');
+          }
+
+          return user;
+        } catch (error) {
+          console.error('Error fetching user:', error);
+          throw new Error('Error fetching user');
+        }
+      },
+    },
   },
 });
 

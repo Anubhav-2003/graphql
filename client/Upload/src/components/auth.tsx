@@ -12,6 +12,7 @@ import {
 import { styled } from '@mui/system';
 import { ContainerProps } from '@mui/material/Container';
 import { useMutation } from '@apollo/client';
+import { FETCH_USER_MUTATION } from '../GraphQL/Mutations/fetchUser';
 
 const StyledContainer = styled(Container)({
     display: 'flex',
@@ -34,6 +35,7 @@ const AuthForm: React.FC = () => {
   const [isLogin, setIsLogin] = useState<boolean>(true);
 
   const [createUserMutation] = useMutation(CREATE_USER_MUTATION)
+  const [fetchUserMutation] = useMutation(FETCH_USER_MUTATION)
 
   const handleToggleForm = () => {
     setIsLogin(!isLogin);
@@ -42,13 +44,25 @@ const AuthForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    try {
-      const { data } = await createUserMutation({
-        variables: { email, password },
-      });
-      console.log('User created:', data.create_user);
-    } catch (error) {
-      console.error('Error creating user:', error);
+    //checking if on signup form or login form.
+    if (!isLogin) {
+      try {
+        const { data } = await createUserMutation({
+          variables: { email, password },
+        });
+        console.log('User created:', data.create_user);
+      } catch (error) {
+        console.error('Error creating user:', error);
+      }
+    } else {
+      try {
+        const { data } = await fetchUserMutation({
+          variables: { email, password },
+        });
+        console.log('User found:', data.create_user);
+      } catch (error) {
+        console.error('No user found:', error);
+      }
     }
 
     setEmail('');
