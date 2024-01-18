@@ -1,6 +1,7 @@
 const minioClient = require('../S3');
 const express = require('express');
 const multer = require('multer');
+const StaticFile = require('../utility/database/models/staticfiles')
 
 const router = express.Router();
 
@@ -28,9 +29,16 @@ router.post('/', upload.array('files', 10), async (req, res) => {
             }
 
             const imageStream = file.buffer; 
-            const objectName = file.originalname;
+            const fileId = generateUniqueIdentifier();
 
-            await minioClient.putObject(bucketName, objectName, imageStream, imageStream.length);
+            await minioClient.putObject(bucketName, fileId, imageStream, imageStream.length);
+
+            const staticFile = new StaticFile({
+                fileId: fileId,
+                mimeType: fileMimeType,
+            });
+
+            await staticFile.save()
         });
 
         await Promise.all(uploadPromises);
