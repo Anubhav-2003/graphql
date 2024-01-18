@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { CREATE_USER_MUTATION } from '../GraphQL/Mutations/createUser';
+import { useNavigate } from 'react-router-dom';
 import {
   TextField,
   Button,
@@ -41,6 +42,7 @@ const AuthForm: React.FC = () => {
     setIsLogin(!isLogin);
   };
 
+  const navigate = useNavigate();
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -50,7 +52,9 @@ const AuthForm: React.FC = () => {
         const { data } = await createUserMutation({
           variables: { email, password },
         });
-        console.log('User created:', data.create_user);
+
+        localStorage.setItem('userId', data.fetchUser.id);
+        navigate('/upload')
       } catch (error) {
         console.error('Error creating user:', error);
       }
@@ -59,7 +63,8 @@ const AuthForm: React.FC = () => {
         const { data } = await fetchUserMutation({
           variables: { email, password },
         });
-        console.log('User found:', data.create_user);
+        localStorage.setItem('userId', data.fetchUser.id);
+        navigate('/upload')
       } catch (error) {
         console.error('No user found:', error);
       }

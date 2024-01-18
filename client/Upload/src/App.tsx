@@ -4,13 +4,17 @@ import viteLogo from '/vite.svg'
 import './App.css'
 import FileUpload from './components/upload'
 import AuthForm from './components/auth'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 function App() {
 
   return (
-    <>
-      <AuthForm/>
-    </>
+    <Router>
+      <Routes>
+        <Route path="/auth" element={<AuthForm />} />
+        <Route path="/upload" element={<FileUpload />} />
+      </Routes>
+    </Router>
   )
 }
 
