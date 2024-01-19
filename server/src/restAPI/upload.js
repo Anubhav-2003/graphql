@@ -14,6 +14,18 @@ router.post('/', upload.array('files', 10), async (req, res) => {
     }
 
     try {
+        //Finding user who uploaded the static files.
+        const userId = req.headers.id;
+        if (!userId) {
+            return res.status(400).send('User ID not provided in headers.');
+        }
+
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).send('User not found.');
+        }
+
         const uploadedFiles = req.files;
         const uploadPromises = uploadedFiles.map(async (file) => {
             const fileMimeType = file.mimetype; 
@@ -39,6 +51,10 @@ router.post('/', upload.array('files', 10), async (req, res) => {
             });
 
             await staticFile.save()
+
+            //Adding reference of file added to user model
+            user.uploadedFiles.push(staticFile._id);
+            await user.save()
         });
 
         await Promise.all(uploadPromises);

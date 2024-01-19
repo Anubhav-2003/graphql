@@ -1,3 +1,5 @@
+const mongoose = require('mongoose');
+
 const staticFileSchema = new mongoose.Schema({
     filename: { type: String, required: true },
   });
