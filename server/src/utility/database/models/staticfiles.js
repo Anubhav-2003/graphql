@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 
 const staticFileSchema = new mongoose.Schema({
-    filename: { type: String, required: true },
+    fileId: { type: String, required: true },
+    mimeType: { type: String, required: true },
   });
   
   const StaticFile = mongoose.model('StaticFile', staticFileSchema);

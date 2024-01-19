@@ -26,9 +26,8 @@ function FileUpload() {
       const response = await fetch('http://localhost:4000/upload', {
         method: 'POST',
         headers: {
-          'Content-Type': 'multipart/form-data',
           'id': localStorage.getItem('userId') || '',
-        } as HeadersInit,
+        },
         body: formData,
       });
 

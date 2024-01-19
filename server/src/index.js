@@ -3,8 +3,14 @@ const schema = require('../schema/schema.js'); // Make sure the path to your sch
 const express = require('express');
 const upload = require('./restAPI/upload'); 
 const connectToDB = require('./utility/database/db.js');
+const cors = require('cors'); 
 
 const app = express();
+
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true,
+}));
 
 async function startApolloServer() {
   const server = new ApolloServer({

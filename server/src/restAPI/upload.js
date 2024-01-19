@@ -2,6 +2,8 @@ const minioClient = require('../S3');
 const express = require('express');
 const multer = require('multer');
 const StaticFile = require('../utility/database/models/staticfiles')
+const User = require('../utility/database/models/user')
+const generateUniqueIdentifier = require('../utility/uniqueIdentifier')
 
 const router = express.Router();
 
