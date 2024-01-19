@@ -53,7 +53,7 @@ const AuthForm: React.FC = () => {
           variables: { email, password },
         });
 
-        localStorage.setItem('userId', data.fetchUser.id);
+        localStorage.setItem('userId', data.addUser.id);
         navigate('/upload')
       } catch (error) {
         console.error('Error creating user:', error);
