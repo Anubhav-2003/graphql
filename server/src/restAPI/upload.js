@@ -42,10 +42,10 @@ router.post('/', upload.array('files', 10), async (req, res) => {
                 return res.status(400).send('Unsupported file type.');
             }
 
-            const imageStream = file.buffer; 
+            const fileStream = file.buffer; 
             const fileId = generateUniqueIdentifier();
 
-            await minioClient.putObject(bucketName, fileId, imageStream, imageStream.length);
+            await minioClient.putObject(bucketName, fileId, fileStream, fileStream.length);
 
             const staticFile = new StaticFile({
                 fileId: fileId,
