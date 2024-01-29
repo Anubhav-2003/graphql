@@ -44,8 +44,15 @@ router.post('/', upload.array('files', 10), async (req, res) => {
 
             const fileStream = file.buffer; 
             const fileId = generateUniqueIdentifier();
+            // Creating Reference for in-house, key management solution.
+            const kmsOptions = {
+                'Content-Type': fileMimeType,
+                'x-amz-server-side-encryption': 'aws:kms',
+                'x-amz-server-side-encryption-aws-kms-key-id': 'transit/upload-key',
+                'x-amz-server-side-encryption-context': 'key1=value1,key2=value2',
+            };
 
-            await minioClient.putObject(bucketName, fileId, fileStream, fileStream.length);
+            await minioClient.putObject(bucketName, fileId, fileStream, fileStream.length, kmsOptions);
 
             const staticFile = new StaticFile({
                 fileId: fileId,

@@ -6,6 +6,7 @@ const minioClient = new Minio.Client({
     useSSL: false,
     accessKey: 'minioadmin',
     secretKey: 'minioadmin',
+    sse: 'AES256', 
   });
 
 module.exports = minioClient
