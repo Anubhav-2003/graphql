@@ -68,7 +68,7 @@ router.post('/', upload.array('files', 10), async (req, res) => {
 
         await Promise.all(uploadPromises);
 
-        return res.status(200).send('Files uploaded successfully.');
+        return res.status(200).send('Upload successfull.');
     } catch (error) {
         console.error('Error uploading files:', error);
         return res.status(500).send('Failed to upload files.');
