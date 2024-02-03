@@ -52,7 +52,12 @@ router.post('/', upload.array('files', 10), async (req, res) => {
                 'x-amz-server-side-encryption-context': 'key1=value1,key2=value2',
             };
 
-            await minioClient.putObject(bucketName, fileId, fileStream, fileStream.length, kmsOptions);
+            try {
+                await minioClient.putObject(bucketName, fileId, fileStream, fileStream.length, kmsOptions);
+                console.log('File uploaded successfully with server-side encryption.');
+            } catch (error) {
+                console.error('Error uploading file:', error);
+            }
 
             const staticFile = new StaticFile({
                 fileId: fileId,
