@@ -6,13 +6,12 @@ const User = require('../utility/database/models/user')
 const generateUniqueIdentifier = require('../utility/uniqueIdentifier')
 const axios = require('axios')
 const router = express.Router();
-
+const Vault = require('node-vault');
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 // Vault API endpoint for encryption
-const VAULT_ENCRYPT_URL = 'http://127.0.0.1:8200/v1/transit/keys/upload-key';
-
+const VAULT_ENCRYPT_URL = 'http://127.0.0.1:8200/v1/transit/encrypt/upload-key';
 
 router.post('/', upload.array('files', 10), async (req, res) => {
     if (!req.files || req.files.length === 0) {
@@ -85,12 +84,12 @@ router.post('/', upload.array('files', 10), async (req, res) => {
 });
 
 // Function to encrypt file data using Vault
+const vault = Vault({ token: 'hvs.2ANZr8zFqKNmP0PVh75N1sSv' });
+
 async function encryptFileData(fileData) {
-    try {
+    try {   
         // Make a POST request to Vault API for encryption
-        const response = await axios.post(VAULT_ENCRYPT_URL, {
-            plaintext: Buffer.from(fileData).toString('base64')
-        });
+        const response = await vault.write('transit/encrypt/upload-key', { plaintext: Buffer.from(fileData).toString('base64') });
 
         // Extract and return the encrypted data from the response
         return Buffer.from(response.data.data.ciphertext, 'base64');
