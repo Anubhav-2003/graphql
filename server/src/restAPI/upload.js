@@ -4,11 +4,15 @@ const multer = require('multer');
 const StaticFile = require('../utility/database/models/staticfiles')
 const User = require('../utility/database/models/user')
 const generateUniqueIdentifier = require('../utility/uniqueIdentifier')
-
+const axios = require('axios')
 const router = express.Router();
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
+
+// Vault API endpoint for encryption
+const VAULT_ENCRYPT_URL = 'http://127.0.0.1:8200/v1/transit/keys/upload-key';
+
 
 router.post('/', upload.array('files', 10), async (req, res) => {
     if (!req.files || req.files.length === 0) {
@@ -42,7 +46,7 @@ router.post('/', upload.array('files', 10), async (req, res) => {
                 return res.status(400).send('Unsupported file type.');
             }
 
-            const fileStream = file.buffer; 
+            const encryptedData = await encryptFileData(file.buffer);
             const fileId = generateUniqueIdentifier();
             // Creating Reference for in-house, key management solution.
             const kmsOptions = {
@@ -53,7 +57,7 @@ router.post('/', upload.array('files', 10), async (req, res) => {
             };
 
             try {
-                await minioClient.putObject(bucketName, fileId, fileStream, fileStream.length, kmsOptions);
+                await minioClient.putObject(bucketName, fileId, encryptedData, fileStream.length, kmsOptions);
                 console.log('File uploaded successfully with server-side encryption.');
             } catch (error) {
                 console.error('Error uploading file:', error);
@@ -79,5 +83,21 @@ router.post('/', upload.array('files', 10), async (req, res) => {
         return res.status(500).send('Failed to upload files.');
     }
 });
+
+// Function to encrypt file data using Vault
+async function encryptFileData(fileData) {
+    try {
+        // Make a POST request to Vault API for encryption
+        const response = await axios.post(VAULT_ENCRYPT_URL, {
+            plaintext: Buffer.from(fileData).toString('base64')
+        });
+
+        // Extract and return the encrypted data from the response
+        return Buffer.from(response.data.data.ciphertext, 'base64');
+    } catch (error) {
+        console.error('Error encrypting file data:', error);
+        throw new Error('Failed to encrypt file data.');
+    }
+}
 
 module.exports = router;
