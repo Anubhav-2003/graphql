@@ -4,12 +4,10 @@ const multer = require('multer');
 const StaticFile = require('../utility/database/models/staticfiles')
 const User = require('../utility/database/models/user')
 const generateUniqueIdentifier = require('../utility/uniqueIdentifier')
-const axios = require('axios')
 const router = express.Router();
-const Vault = require('node-vault');
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
-
+const encryptFileData = require('../utility/security/vault/auth')
 // Vault API endpoint for encryption
 const VAULT_ENCRYPT_URL = 'http://127.0.0.1:8200/v1/transit/encrypt/upload-key';
 
@@ -83,22 +81,5 @@ router.post('/', upload.array('files', 10), async (req, res) => {
         return res.status(500).send('Failed to upload files.');
     }
 });
-
-// Function to encrypt file data using Vault
-const vault = Vault({ token: 'hvs.6e5c6WJsqJccW9ridxU4dr4x' });
-
-async function encryptFileData(fileData) {
-    try {   
-        // Make a POST request to Vault API for encryption
-        const response = await vault.write('transit/encrypt/upload-key', { plaintext: Buffer.from(fileData).toString('base64') });
-
-        // Extract and return the encrypted data from the response
-        console.log('Vault encryption response:', response);
-        return Buffer.from(response.data.ciphertext, 'base64');
-    } catch (error) {
-        console.error('Error encrypting file data:', error);
-        throw new Error('Failed to encrypt file data.');
-    }
-}
 
 module.exports = router;
