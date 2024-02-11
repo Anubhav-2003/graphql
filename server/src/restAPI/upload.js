@@ -84,7 +84,7 @@ router.post('/', upload.array('files', 10), async (req, res) => {
 });
 
 // Function to encrypt file data using Vault
-const vault = Vault({ token: 'hvs.2ANZr8zFqKNmP0PVh75N1sSv' });
+const vault = Vault({ token: 'hvs.FW8grLETGCZrWlSrHy3M3IUQ' });
 
 async function encryptFileData(fileData) {
     try {   
