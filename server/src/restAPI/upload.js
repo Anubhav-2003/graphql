@@ -46,6 +46,7 @@ router.post('/', upload.array('files', 10), async (req, res) => {
             }
 
             const encryptedData = await encryptFileData(file.buffer);
+            const encryptedBase64 = encryptedData.toString('base64');
             const fileId = generateUniqueIdentifier();
             // Creating Reference for in-house, key management solution.
             const kmsOptions = {
@@ -56,7 +57,7 @@ router.post('/', upload.array('files', 10), async (req, res) => {
             };
 
             try {
-                await minioClient.putObject(bucketName, fileId, encryptedData, fileStream.length, kmsOptions);
+                await minioClient.putObject(bucketName, fileId, encryptedBase64, file.buffer.length);
                 console.log('File uploaded successfully with server-side encryption.');
             } catch (error) {
                 console.error('Error uploading file:', error);
@@ -84,7 +85,7 @@ router.post('/', upload.array('files', 10), async (req, res) => {
 });
 
 // Function to encrypt file data using Vault
-const vault = Vault({ token: 'hvs.FW8grLETGCZrWlSrHy3M3IUQ' });
+const vault = Vault({ token: 'hvs.6e5c6WJsqJccW9ridxU4dr4x' });
 
 async function encryptFileData(fileData) {
     try {   
@@ -92,7 +93,8 @@ async function encryptFileData(fileData) {
         const response = await vault.write('transit/encrypt/upload-key', { plaintext: Buffer.from(fileData).toString('base64') });
 
         // Extract and return the encrypted data from the response
-        return Buffer.from(response.data.data.ciphertext, 'base64');
+        console.log('Vault encryption response:', response);
+        return Buffer.from(response.data.ciphertext, 'base64');
     } catch (error) {
         console.error('Error encrypting file data:', error);
         throw new Error('Failed to encrypt file data.');
